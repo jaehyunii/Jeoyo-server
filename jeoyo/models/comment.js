@@ -1,7 +1,7 @@
 
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('comment', { 
-        comment: {
+    return sequelize.define('comment', {
+        comments: {
             type: DataTypes.STRING(100),
             allowNull: false,
         },
@@ -10,7 +10,9 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
             defaultValue: DataTypes.NOW,
         },
-    }, 
-    { timestamps: true, paranoid: true, charset: 'utf8', collate: 'utf8_general_ci' }
-    );
-  };
+    }, {
+        timestamps: false,
+        charset: 'utf8',
+        collate: 'utf8_general_ci',
+    })
+};

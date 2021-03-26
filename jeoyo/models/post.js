@@ -1,6 +1,6 @@
+
 module.exports = (sequelize, DataTypes) => {
-    return sequelize.define('post',
-      {
+    return sequelize.define('post', {
         content: {
             type: DataTypes.STRING(140),
             allowNull: false,
@@ -9,7 +9,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING(200),
             allowNull: true,
         },
-    }, 
-    { timestamps: true, paranoid: true, charset: 'utf8', collate: 'utf8_general_ci' }
-    );
-  };
+    }, {
+        timestamps: true,
+        paranoid: true,
+        charset: 'utf8',
+        collate: 'utf8_general_ci',
+    })
+};

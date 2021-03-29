@@ -1,54 +1,64 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var session = require('express-session');
-var flash = require('connect-flash');
-var dotenv = require('dotenv');
-//var webSocket = require('./socket');
-var indexRouter = require('./routes/index');
-var userRouter = require('./routes/user');
-var db = require('./models');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
+const path = require('path');
+const session = require('express-session');
+const flash = require('connect-flash');
+const passport = require('passport');
+require('dotenv').config();
 
-dotenv.config();
-//mysql 연동
-db.sequelize.sync();
+const pageRouter = require('./routes/page');
+const authRouter = require('./routes/auth');
+//const postRouter = require('./routes/post');
+//const userRouter = require('./routes/user');
+const { sequelize } = require('./models');
+const passportConfig = require('./passport');
 
-var app = express();
+const app = express();
+sequelize.sync();
+passportConfig(passport);
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'pug');
+app.set('port', 3000);
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
+app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(session({
+  resave: false,
+  saveUninitialized: false,
+  secret: process.env.COOKIE_SECRET,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+  },
+}));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.use('/', indexRouter);
-app.use('/user', userRouter);
+app.use('/', pageRouter);
+app.use('/auth', authRouter);
+//app.use('/post', postRouter);
+//app.use('/user', userRouter);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+app.use((req, res, next) => {
+  const err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
 
-// listen
-app.listen(3000, () => {
-  return console.log(`success on : http://localhost:3000`);
+app.listen(app.get('port'), () => {
+  console.log(app.get('port'), '번 포트에서 대기중');
 });
 
 module.exports = app;

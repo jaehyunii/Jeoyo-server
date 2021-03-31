@@ -15,6 +15,17 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             unique: false,
         },
+        //인증여부
+        email_verified: {
+            type: DataTypes.TINYINT(2),
+            default : false,
+            required: true,
+        },
+        //인증코드
+        key_for_verify: {
+            type: DataTypes.STRING(150),
+            required: true,
+        },
     }, {
         timestamps: false,
         charset: 'utf8',

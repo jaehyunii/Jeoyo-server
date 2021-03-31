@@ -25,6 +25,23 @@ router.get('/', (req, res, next) => {
   });
 });
 
+router.get('/confirmEmail',function (req,res) {
+  User.updateOne({key_for_verify:req.query.key},{$set:{email_verified:true}}, function(err,user){
+      //에러처리
+      if (err) {
+          console.log(err);
+      }
+      //일치하는 key가 없으면
+      else if(user.n==0){
+          res.send('<script type="text/javascript">alert("Not verified"); window.location="/"; </script>');
+      }
+      //인증 성공
+      else {
+          res.send('<script type="text/javascript">alert("Successfully verified"); window.location="/"; </script>');
+      }
+  });
+});
+
 /* router.get('/', (req, res, next) => {
   Post.findAll({
     include: {
